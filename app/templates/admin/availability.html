@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Availability Calendar & Blocked Dates - Admin StayEase{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Resort Availability Calendar & Operations</h2>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">← Back to Dashboard</a>
+</div>
+
+<div class="row">
+    <!-- Block New Date Range -->
+    <div class="col-lg-5 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Block Date Range (Maintenance / Closure)</h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">Prevent new bookings for a specific unit or resort-wide during operational maintenance or private events.</p>
+                <form action="{{ url_for('admin.availability') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="accommodationUnit" class="form-label fw-bold small">Scope / Accommodation Unit</label>
+                        <select class="form-select" id="accommodationUnit" name="accommodation_unit_id">
+                            <option value="0">All Units (Resort-Wide Operational Closure)</option>
+                            {% for u in accommodations %}
+                                <option value="{{ u.id }}">{{ u.name }} (Capacity: {{ u.capacity }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label fw-bold small">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" name="start_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="endDate" class="form-label fw-bold small">End Date</label>
+                        <input type="date" class="form-control" id="endDate" name="end_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="blockReason" class="form-label fw-bold small">Reason / Event Description</label>
+                        <input type="text" class="form-control" id="blockReason" name="reason" placeholder="e.g. Pool Maintenance, Private Function, Typhoon Warning...">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-danger">Block Selected Date Range</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Reservations & Blocked Dates List -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Configured Blocked Dates & Operational Closures</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if not blocked_dates %}
+                    <div class="p-4 text-center text-muted">No blocked dates currently configured.</div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Scope</th>
+                                    <th>Dates</th>
+                                    <th>Reason</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in blocked_dates %}
+                                    <tr>
+                                        <td>
+                                            {% if b.accommodation %}
+                                                <span class="badge bg-info text-dark">{{ b.accommodation.name }}</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Resort-Wide Closure</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ b.start_date.strftime('%b %d, %Y') }} to {{ b.end_date.strftime('%b %d, %Y') }}</td>
+                                        <td>{{ b.reason or 'No reason provided' }}</td>
+                                        <td>
+                                            <form action="{{ url_for('admin.unblock_date', blocked_id=b.id) }}" method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this blocked date configuration?');">Unblock</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Active Reservations Blocking Calendar Availability</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if not bookings %}
+                    <div class="p-4 text-center text-muted">No active (Pending/Approved) reservations.</div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Unit</th>
+                                    <th>Dates</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in bookings %}
+                                    <tr>
+                                        <td class="font-monospace fw-bold">{{ b.booking_reference }}</td>
+                                        <td>{{ b.accommodation.name }}</td>
+                                        <td>{{ b.check_in_date.strftime('%b %d') }} - {{ b.check_out_date.strftime('%b %d, %Y') }}</td>
+                                        <td>
+                                            {% if b.booking_status == 'pending' %}
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            {% elif b.booking_status == 'approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

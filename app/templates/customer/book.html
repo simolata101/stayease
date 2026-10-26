@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Book {{ unit.name }} - StayEase Resort{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-sm mt-3 mb-5">
+            <div class="card-header bg-dark text-white p-3">
+                <h4 class="mb-0">Reservation Request for {{ unit.name }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info">
+                    <strong>Accommodation Rate:</strong> ₱{{ "{:,.2f}".format(unit.nightly_rate) }} / night | 
+                    <strong>Capacity:</strong> Up to {{ unit.capacity }} guests
+                </div>
+
+                <form method="POST" action="{{ url_for('customer.book', unit_id=unit.id) }}" id="bookingForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.accommodation_unit_id.label(class="form-label fw-bold") }}
+                        {{ form.accommodation_unit_id(class="form-select", id="unitSelect") }}
+                        {% for error in form.accommodation_unit_id.errors %}
+                            <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.check_in.label(class="form-label fw-bold") }}
+                            {{ form.check_in(class="form-control", id="checkInInput", type="date") }}
+                            {% for error in form.check_in.errors %}
+                                <span class="text-danger small">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            {{ form.check_out.label(class="form-label fw-bold") }}
+                            {{ form.check_out(class="form-control", id="checkOutInput", type="date") }}
+                            {% for error in form.check_out.errors %}
+                                <span class="text-danger small">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.guests.label(class="form-label fw-bold") }}
+                        {{ form.guests(class="form-control", id="guestsInput", min="1", max=unit.capacity) }}
+                        <div class="form-text">Maximum {{ unit.capacity }} guests permitted for this unit.</div>
+                        {% for error in form.guests.errors %}
+                            <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.special_requests.label(class="form-label fw-bold") }}
+                        {{ form.special_requests(class="form-control", rows="3", placeholder="Any special requirements, arrival time, or notes...") }}
+                    </div>
+
+                    <div class="card bg-light border-success my-4">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-success">Estimated Price Summary</h5>
+                            <h2 class="display-6 fw-bold text-dark" id="estimatedPrice">₱{{ "{:,.2f}".format(unit.nightly_rate) }}</h2>
+                            <p class="text-muted mb-0" id="nightsCount">1 night stay</p>
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="policyAgreement" required>
+                        <label class="form-check-label small text-muted" for="policyAgreement">
+                            I acknowledge and agree to StayEase Resort's booking policies and understand that submitting this form creates a <strong>pending request</strong> subject to administrator approval.
+                        </label>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                        <a href="{{ url_for('public.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkInInput = document.getElementById('checkInInput');
+    const checkOutInput = document.getElementById('checkOutInput');
+    const estimatedPriceEl = document.getElementById('estimatedPrice');
+    const nightsCountEl = document.getElementById('nightsCount');
+    const nightlyRate = {{ unit.nightly_rate }};
+
+    function updateEstimate() {
+        if (checkInInput.value && checkOutInput.value) {
+            const start = new Date(checkInInput.value);
+            const end = new Date(checkOutInput.value);
+            const diffTime = end - start;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 0) {
+                const total = diffDays * nightlyRate;
+                estimatedPriceEl.textContent = '₱' + total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                nightsCountEl.textContent = diffDays + (diffDays === 1 ? ' night stay' : ' nights stay');
+            } else {
+                estimatedPriceEl.textContent = '₱0.00';
+                nightsCountEl.textContent = 'Check-out date must be after check-in date.';
+            }
+        }
+    }
+
+    checkInInput.addEventListener('change', updateEstimate);
+    checkOutInput.addEventListener('change', updateEstimate);
+    updateEstimate();
+});
+</script>
+{% endblock %}

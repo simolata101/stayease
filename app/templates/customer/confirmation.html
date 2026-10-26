@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Confirmation - StayEase Resort{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-sm mt-4 mb-5 text-center border-success">
+            <div class="card-header bg-success text-white py-4">
+                <i class="bi bg-success fs-1"></i>
+                <h2 class="mb-0">Booking Request Received!</h2>
+            </div>
+            <div class="card-body p-4">
+                <p class="lead">Thank you, <strong>{{ booking.customer.full_name }}</strong>. Your reservation request has been successfully submitted and is currently <strong>PENDING ADMINISTRATOR APPROVAL</strong>.</p>
+
+                <div class="p-3 bg-light rounded my-4 border">
+                    <span class="text-muted text-uppercase small d-block mb-1">Your Booking Reference Number</span>
+                    <h3 class="fw-bold text-success font-monospace mb-0">{{ booking.booking_reference }}</h3>
+                </div>
+
+                <div class="row text-start my-4">
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted d-block small">Accommodation</span>
+                        <strong class="fs-6">{{ booking.accommodation.name }}</strong>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted d-block small">Dates of Stay</span>
+                        <strong class="fs-6">{{ booking.check_in_date.strftime('%b %d, %Y') }} to {{ booking.check_out_date.strftime('%b %d, %Y') }}</strong>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted d-block small">Guest Count</span>
+                        <strong class="fs-6">{{ booking.guest_count }} guest(s)</strong>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted d-block small">Estimated Total</span>
+                        <strong class="fs-6 text-dark">₱{{ "{:,.2f}".format(booking.total_price) }}</strong>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning text-start small mb-4">
+                    <strong>Payment Information Notice:</strong> No online payment is collected at this stage. Payments are recorded manually by the resort administrator upon confirmation. Please save your Booking Reference Number for inquiries.
+                </div>
+
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="{{ url_for('customer.my_bookings') }}" class="btn btn-primary btn-lg px-4">View My Bookings</a>
+                    <a href="{{ url_for('public.index') }}" class="btn btn-outline-secondary btn-lg px-4">Return Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

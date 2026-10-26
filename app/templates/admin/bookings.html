@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Reservation Requests - Admin StayEase{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Reservation Requests & Management</h2>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">← Back to Dashboard</a>
+</div>
+
+<!-- Search and Filter Bar -->
+<div class="card shadow-sm p-3 mb-4 bg-light">
+    <form method="GET" action="{{ url_for('admin.bookings') }}" class="row g-2 align-items-center">
+        <div class="col-md-5">
+            <input type="text" name="search" class="form-control" placeholder="Search by reference, customer name or email..." value="{{ search_query or '' }}">
+        </div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('admin.bookings') }}" class="btn btn-outline-secondary w-100">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Bookings Table -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        {% if not bookings %}
+            <div class="p-5 text-center text-muted">
+                <h5>No reservation requests found</h5>
+                <p>Try adjusting your search or filter settings.</p>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Reference</th>
+                            <th>Customer</th>
+                            <th>Accommodation</th>
+                            <th>Check-In / Out</th>
+                            <th>Guests</th>
+                            <th>Total</th>
+                            <th>Booking Status</th>
+                            <th>Payment Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in bookings %}
+                            {% set b = item.booking %}
+                            {% set p = item.payment_summary %}
+                            <tr>
+                                <td class="font-monospace fw-bold text-primary">{{ b.booking_reference }}</td>
+                                <td>
+                                    <div><strong>{{ b.customer.full_name }}</strong></div>
+                                    <small class="text-muted">{{ b.customer.email }} | {{ b.customer.contact_number }}</small>
+                                </td>
+                                <td>{{ b.accommodation.name }}</td>
+                                <td>{{ b.check_in_date.strftime('%b %d, %Y') }}<br>to {{ b.check_out_date.strftime('%b %d, %Y') }}</td>
+                                <td>{{ b.guest_count }}</td>
+                                <td class="fw-bold">₱{{ "{:,.2f}".format(b.total_price) }}</td>
+                                <td>
+                                    {% if b.booking_status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif b.booking_status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif b.booking_status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% elif b.booking_status == 'cancelled' %}
+                                        <span class="badge bg-secondary">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if p.payment_status == 'Paid' %}
+                                        <span class="badge bg-success">Paid</span>
+                                    {% elif p.payment_status == 'Partially Paid' %}
+                                        <span class="badge bg-warning text-dark">Partially Paid</span>
+                                    {% else %}
+                                        <span class="badge bg-outline-danger text-danger border border-danger">Unpaid</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin.booking_detail', booking_id=b.id) }}" class="btn btn-sm btn-primary">Manage</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

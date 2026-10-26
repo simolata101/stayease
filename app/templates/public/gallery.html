@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Resort Photo Gallery - {{ resort.name if resort else 'StayEase Resort' }}{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h2 class="fw-bold">Resort Photo Gallery</h2>
+    <p class="text-muted">Take a visual tour of our tropical beachfront, luxury villas, and resort infrastructure.</p>
+</div>
+
+{% if items %}
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+    {% for item in items %}
+    <div class="col">
+        <div class="card h-100 shadow-sm border-0">
+            <img src="{{ item.image_url }}" class="card-img-top" alt="{{ item.title }}" style="height: 220px; object-fit: cover;">
+            <div class="card-body text-center">
+                <span class="badge bg-light text-dark border mb-2">{{ item.category }}</span>
+                <h5 class="card-title">{{ item.title }}</h5>
+                <p class="card-text text-muted small">{{ item.caption or '' }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card p-5 text-center shadow-sm">
+    <h4 class="text-muted">No Gallery Photos Currently Available</h4>
+    <p>Please check back soon as we update our facility photos.</p>
+</div>
+{% endif %}
+
+<div class="bg-light p-4 rounded text-center my-4">
+    <h4 class="fw-bold mb-2">Ready to Experience Paradise?</h4>
+    <p class="text-muted">Check our real-time availability and request your reservation today.</p>
+    <a href="/" class="btn btn-success btn-lg">Check Availability & Book</a>
+</div>
+{% endblock %}

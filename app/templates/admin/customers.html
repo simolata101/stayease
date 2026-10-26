@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Registered Customers - Admin StayEase{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Registered Customers & History</h2>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">← Back to Dashboard</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        {% if not customers %}
+            <div class="p-4 text-center text-muted">No registered customer accounts found.</div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Email Address</th>
+                            <th>Contact Number</th>
+                            <th>Account Created</th>
+                            <th>Bookings Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in customers %}
+                            <tr>
+                                <td><strong>{{ c.full_name }}</strong></td>
+                                <td>{{ c.email }}</td>
+                                <td>{{ c.contact_number or 'N/A' }}</td>
+                                <td>{{ c.created_at.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ c.bookings|length }} reservation(s)</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

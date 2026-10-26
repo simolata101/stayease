@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Accommodations & Rates - Admin StayEase{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Accommodations & Cottage Management</h2>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">← Back to Dashboard</a>
+</div>
+
+<div class="row">
+    <!-- Add Unit Form -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Add Accommodation Unit</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('admin.accommodations') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="unitName" class="form-label fw-bold small">Unit / Cottage Name</label>
+                        <input type="text" class="form-control" id="unitName" name="name" required placeholder="e.g. Sunset Villa">
+                    </div>
+                    <div class="mb-3">
+                        <label for="capacity" class="form-label fw-bold small">Guest Capacity</label>
+                        <input type="number" class="form-control" id="capacity" name="capacity" min="1" max="50" value="2" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nightlyRate" class="form-label fw-bold small">Nightly Rate (₱)</label>
+                        <input type="number" step="0.01" class="form-control" id="nightlyRate" name="nightly_rate" min="0" value="3500.00" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="unitDesc" class="form-label fw-bold small">Description</label>
+                        <textarea class="form-control" id="unitDesc" name="description" rows="3" placeholder="Amenities, view, bed type..."></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Create Accommodation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Units Table -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Configured Accommodation Inventory</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if not units %}
+                    <div class="p-4 text-center text-muted">No accommodation units configured yet.</div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Capacity</th>
+                                    <th>Nightly Rate</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in units %}
+                                    <tr>
+                                        <td><strong>{{ u.name }}</strong></td>
+                                        <td>{{ u.capacity }} guest(s)</td>
+                                        <td class="fw-bold text-success">₱{{ "{:,.2f}".format(u.nightly_rate) }}</td>
+                                        <td><small class="text-muted">{{ u.description or 'No description' }}</small></td>
+                                        <td>
+                                            {% if u.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactive</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <form action="{{ url_for('admin.toggle_accommodation', unit_id=u.id) }}" method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm {% if u.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                                    {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                                                </button>
+                                            </form>
+                                            <form action="{{ url_for('admin.delete_accommodation', unit_id=u.id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Are you sure you want to delete this accommodation unit? If there are active reservations, deletion will be blocked.');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

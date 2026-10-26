@@ -1,0 +1,49 @@
+:root {
+    --primary-color: #1b4332; /* Tropical teal / deep green */
+    --primary-light: #2d6a4f;
+    --accent-color: #d4a373; /* Sand color */
+    --bg-color: #f4f1de; /* Warm white / cream */
+    --text-color: #2b2b2b;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.navbar {
+    background-color: var(--primary-color) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-light);
+}
+
+.search-card {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.accommodation-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.accommodation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-title {
+    color: var(--primary-color);
+    font-weight: 700;
+}

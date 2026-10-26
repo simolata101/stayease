@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Resort Settings - Admin StayEase{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Resort Information & Settings</h2>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">← Back to Dashboard</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-5">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Configure Resort Branding & Public Contact Info</h5>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('admin.resort_settings') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="resortName" class="form-label fw-bold">Resort Name</label>
+                        <input type="text" class="form-control" id="resortName" name="name" value="{{ resort.name or '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="resortLocation" class="form-label fw-bold">Location Address</label>
+                        <input type="text" class="form-control" id="resortLocation" name="location" value="{{ resort.location or '' }}">
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="contactEmail" class="form-label fw-bold">Contact Email</label>
+                            <input type="email" class="form-control" id="contactEmail" name="contact_email" value="{{ resort.contact_email or '' }}">
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label for="contactPhone" class="form-label fw-bold">Contact Phone Number</label>
+                            <input type="text" class="form-control" id="contactPhone" name="contact_phone" value="{{ resort.contact_phone or '' }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="resortDesc" class="form-label fw-bold">Public Description</label>
+                        <textarea class="form-control" id="resortDesc" name="description" rows="4">{{ resort.description or '' }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="heroImageUrl" class="form-label fw-bold">Front-End Banner / Hero Cover Image URL</label>
+                        <input type="url" class="form-control" id="heroImageUrl" name="hero_image_url" value="{{ resort.hero_image_url or '' }}" placeholder="https://images.unsplash.com/photo-...">
+                        <div class="form-text">Used on the main homepage banner when resort infrastructure is updated.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="resortPolicies" class="form-label fw-bold">Resort Booking & Cancellation Policies</label>
+                        <textarea class="form-control" id="resortPolicies" name="policies" rows="5" placeholder="Enter check-in/out times, deposit rules, cancellation windows...">{{ resort.policies or '' }}</textarea>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

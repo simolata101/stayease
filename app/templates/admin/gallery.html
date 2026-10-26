@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Gallery Maintenance - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Gallery & Infrastructure Photo Maintenance</h2>
+        <p class="text-muted">Add, update, publish, or hide photos of resort accommodations, pools, and facilities.</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGalleryModal">
+        + Add New Photo
+    </button>
+</div>
+
+{% if items %}
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+    {% for item in items %}
+    <div class="col">
+        <div class="card h-100 shadow-sm {% if not item.is_active %}border-secondary bg-light opacity-75{% endif %}">
+            <img src="{{ item.image_url }}" class="card-img-top" alt="{{ item.title }}" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title mb-0">{{ item.title }}</h5>
+                    <span class="badge {% if item.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if item.is_active %}Published{% else %}Hidden{% endif %}
+                    </span>
+                </div>
+                <p class="card-text text-muted small">{{ item.caption or 'No caption provided.' }}</p>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <small class="badge bg-outline-dark text-dark border">{{ item.category }}</small>
+                    <small class="text-muted">Order: #{{ item.display_order }}</small>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between pb-3">
+                <form action="{{ url_for('admin.toggle_gallery_item', item_id=item.id) }}" method="POST" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm {% if item.is_active %}btn-warning{% else %}btn-success{% endif %}">
+                        {% if item.is_active %}Hide{% else %}Publish{% endif %}
+                    </button>
+                </form>
+
+                <form action="{{ url_for('admin.delete_gallery_item', item_id=item.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this photo?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card p-5 text-center shadow-sm">
+    <h4 class="text-muted">No Gallery Photos Found</h4>
+    <p>Get started by adding photos of your resort infrastructure and facilities.</p>
+</div>
+{% endif %}
+
+<!-- Add Gallery Modal -->
+<div class="modal fade" id="addGalleryModal" tabindex="-1" aria-labelledby="addGalleryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('admin.gallery') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addGalleryModalLabel">Add Photo to Gallery</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label fw-bold small">Photo Title *</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="e.g. Infinity Beach Pool" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="caption" class="form-label fw-bold small">Caption / Description</label>
+                        <input type="text" class="form-control" id="caption" name="caption" placeholder="e.g. Overlooking crystal clear ocean waters">
+                    </div>
+                    <div class="mb-3">
+                        <label for="image_url" class="form-label fw-bold small">Image URL *</label>
+                        <input type="url" class="form-control" id="image_url" name="image_url" placeholder="https://images.unsplash.com/photo-..." required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="category" class="form-label fw-bold small">Category</label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="Villas">Villas</option>
+                                <option value="Cottages">Cottages</option>
+                                <option value="Amenities">Amenities</option>
+                                <option value="Beach">Beach</option>
+                                <option value="Dining">Dining</option>
+                                <option value="General">General</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="display_order" class="form-label fw-bold small">Display Order</label>
+                            <input type="number" class="form-control" id="display_order" name="display_order" value="1" min="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Photo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
