@@ -46,7 +46,9 @@ StayEase is a centralized web application designed for resort and hotel owners t
 
 ## Getting Started
 
-### 1. Prerequisites & Virtual Environment
+For detailed step-by-step setup instructions on **Windows, macOS, and Linux**, as well as the **Windows Contingency Troubleshooting Guide**, see [SETUP_GUIDE.md](file:///config/Desktop/Hotel/SETUP_GUIDE.md).
+
+### Quick Start (Linux / macOS)
 
 ```bash
 # Clone or navigate to the project directory
