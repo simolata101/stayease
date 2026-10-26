@@ -77,13 +77,64 @@ def seed_demo():
     # Seed Accommodations
     if AccommodationUnit.query.count() == 0:
         units = [
-            AccommodationUnit(name="Sunset Ocean Villa", description="Luxury private villa with direct beach access and infinity plunge pool.", capacity=4, nightly_rate=7500.00),
-            AccommodationUnit(name="Palm Garden Cottage", description="Spacious tropical cottage surrounded by lush garden flora.", capacity=6, nightly_rate=5500.00),
-            AccommodationUnit(name="Beachfront Suite", description="Romantic master suite featuring panoramic ocean views and private balcony.", capacity=2, nightly_rate=4200.00)
+            AccommodationUnit(
+                name="Sunset Ocean Villa", 
+                description="Luxury private villa with direct beach access and infinity plunge pool.", 
+                capacity=4, 
+                nightly_rate=7500.00,
+                image_url="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80"
+            ),
+            AccommodationUnit(
+                name="Palm Garden Cottage", 
+                description="Spacious tropical cottage surrounded by lush garden flora.", 
+                capacity=6, 
+                nightly_rate=5500.00,
+                image_url="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+            ),
+            AccommodationUnit(
+                name="Beachfront Suite", 
+                description="Romantic master suite featuring panoramic ocean views and private balcony.", 
+                capacity=2, 
+                nightly_rate=4200.00,
+                image_url="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80"
+            )
         ]
         db.session.add_all(units)
         db.session.commit()
-        print("Demo accommodations seeded.")
+
+        # Seed Interior & Feature Image Sets for each Cottage Choice Package
+        from app.models import AccommodationImage
+        
+        u1 = units[0] # Sunset Ocean Villa
+        u2 = units[1] # Palm Garden Cottage
+        u3 = units[2] # Beachfront Suite
+
+        images_u1 = [
+            AccommodationImage(accommodation_unit_id=u1.id, image_url="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80", title="Private Villa & Pool", caption="Infinity plunge pool overlooking the ocean beach.", is_interior=False, display_order=1),
+            AccommodationImage(accommodation_unit_id=u1.id, image_url="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80", title="Master Bedroom", caption="King-size bed with sea view and premium linens.", is_interior=True, display_order=2),
+            AccommodationImage(accommodation_unit_id=u1.id, image_url="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80", title="Living & Lounge Space", caption="Air-conditioned lounge with smart TV and plush sofa.", is_interior=True, display_order=3),
+            AccommodationImage(accommodation_unit_id=u1.id, image_url="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80", title="Luxury Ensuite Bathroom", caption="Marble soaking tub, rain shower, and double vanity.", is_interior=True, display_order=4),
+            AccommodationImage(accommodation_unit_id=u1.id, image_url="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80", title="Private Sunset Deck", caption="Sun loungers and outdoor dining table.", is_interior=False, display_order=5),
+        ]
+
+        images_u2 = [
+            AccommodationImage(accommodation_unit_id=u2.id, image_url="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80", title="Garden Cottage Porch", caption="Lush tropical flora surrounding private porch.", is_interior=False, display_order=1),
+            AccommodationImage(accommodation_unit_id=u2.id, image_url="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80", title="Cottage Living Room", caption="Warm wooden interiors with comfortable family seating.", is_interior=True, display_order=2),
+            AccommodationImage(accommodation_unit_id=u2.id, image_url="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80", title="Family Bedroom", caption="Multiple comfortable beds with air conditioning.", is_interior=True, display_order=3),
+            AccommodationImage(accommodation_unit_id=u2.id, image_url="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80", title="Kitchenette & Dining", caption="Equipped with mini-fridge, microwave, and dining nook.", is_interior=True, display_order=4),
+            AccommodationImage(accommodation_unit_id=u2.id, image_url="https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=800&q=80", title="Ensuite Bathroom", caption="Clean modern bathroom with hot water shower.", is_interior=True, display_order=5),
+        ]
+
+        images_u3 = [
+            AccommodationImage(accommodation_unit_id=u3.id, image_url="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800&q=80", title="Suite Balcony & Ocean View", caption="Panoramic views directly overlooking the beach.", is_interior=False, display_order=1),
+            AccommodationImage(accommodation_unit_id=u3.id, image_url="https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80", title="Honeymoon Suite Bedroom", caption="Romantic king bed layout with ocean breeze.", is_interior=True, display_order=2),
+            AccommodationImage(accommodation_unit_id=u3.id, image_url="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80", title="Rain Shower Bathroom", caption="Glass-enclosed rainfall shower with premium toiletries.", is_interior=True, display_order=3),
+            AccommodationImage(accommodation_unit_id=u3.id, image_url="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80", title="Private Balcony Lounge", caption="Seating area for sunset cocktails.", is_interior=True, display_order=4),
+        ]
+
+        db.session.add_all(images_u1 + images_u2 + images_u3)
+        db.session.commit()
+        print("Demo accommodations and cottage interior image sets seeded.")
 
     # Seed Sample Booking Request if none exists
     if Booking.query.count() == 0 and customer and AccommodationUnit.query.first():

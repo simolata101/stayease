@@ -1,6 +1,6 @@
 from app.models.user import User
 from app.models.resort import Resort
-from app.models.accommodation import AccommodationUnit
+from app.models.accommodation import AccommodationUnit, AccommodationImage
 from app.models.booking import Booking, BookingStatusHistory
 from app.models.blocked_date import BlockedDate
 from app.models.payment import Payment
@@ -10,6 +10,7 @@ __all__ = [
     'User',
     'Resort',
     'AccommodationUnit',
+    'AccommodationImage',
     'Booking',
     'BookingStatusHistory',
     'BlockedDate',

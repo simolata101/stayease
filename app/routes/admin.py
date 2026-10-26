@@ -3,7 +3,7 @@ from decimal import Decimal
 from flask import Blueprint, render_template, redirect, url_for, flash, request, g
 from sqlalchemy import or_
 from app import db
-from app.models import User, Resort, AccommodationUnit, Booking, BlockedDate, Payment, GalleryItem
+from app.models import User, Resort, AccommodationUnit, AccommodationImage, Booking, BlockedDate, Payment, GalleryItem
 from app.routes.auth import admin_required
 from app.services import BookingService, AvailabilityService, PaymentService
 
@@ -294,6 +294,8 @@ def customers():
 @admin_bp.route('/gallery', methods=['GET', 'POST'])
 @admin_required
 def gallery():
+    active_tab = request.args.get('active_tab', 'cottages')
+
     if request.method == 'POST':
         title = request.form.get('title')
         caption = request.form.get('caption')
@@ -315,10 +317,11 @@ def gallery():
             db.session.add(item)
             db.session.commit()
             flash(f"Gallery photo '{title}' added successfully.", 'success')
-            return redirect(url_for('admin.gallery'))
+            return redirect(url_for('admin.gallery', active_tab='general'))
 
     items = GalleryItem.query.order_by(GalleryItem.display_order.asc(), GalleryItem.created_at.desc()).all()
-    return render_template('admin/gallery.html', items=items)
+    accommodations = AccommodationUnit.query.all()
+    return render_template('admin/gallery.html', items=items, accommodations=accommodations, active_tab=active_tab)
 
 @admin_bp.route('/gallery/<int:item_id>/toggle', methods=['POST'])
 @admin_required
@@ -329,7 +332,7 @@ def toggle_gallery_item(item_id):
         db.session.commit()
         status_str = "published" if item.is_active else "hidden"
         flash(f"Gallery photo '{item.title}' is now {status_str}.", 'info')
-    return redirect(url_for('admin.gallery'))
+    return redirect(url_for('admin.gallery', active_tab='general'))
 
 @admin_bp.route('/gallery/<int:item_id>/delete', methods=['POST'])
 @admin_required
@@ -339,5 +342,68 @@ def delete_gallery_item(item_id):
         db.session.delete(item)
         db.session.commit()
         flash(f"Gallery photo '{item.title}' deleted.", 'success')
-    return redirect(url_for('admin.gallery'))
+    return redirect(url_for('admin.gallery', active_tab='general'))
+
+@admin_bp.route('/gallery/cottage-image/add', methods=['POST'])
+@admin_required
+def add_cottage_image():
+    unit_id = request.form.get('accommodation_unit_id')
+    title = request.form.get('title')
+    caption = request.form.get('caption')
+    image_url = request.form.get('image_url')
+    is_interior = request.form.get('is_interior') == '1'
+    display_order = int(request.form.get('display_order', 0))
+
+    if not unit_id or not image_url:
+        flash('Cottage choice package and Image URL are required.', 'danger')
+    else:
+        img = AccommodationImage(
+            accommodation_unit_id=int(unit_id),
+            title=title or 'Cottage Interior',
+            caption=caption,
+            image_url=image_url,
+            is_interior=is_interior,
+            display_order=display_order
+        )
+        db.session.add(img)
+        db.session.commit()
+        flash('New interior photo added to cottage package.', 'success')
+
+    return redirect(url_for('admin.gallery', active_tab='cottages'))
+
+@admin_bp.route('/gallery/cottage-image/<int:image_id>/edit', methods=['POST'])
+@admin_required
+def edit_cottage_image(image_id):
+    img = db.session.get(AccommodationImage, image_id)
+    if not img:
+        flash('Cottage photo not found.', 'danger')
+        return redirect(url_for('admin.gallery', active_tab='cottages'))
+
+    title = request.form.get('title')
+    caption = request.form.get('caption')
+    image_url = request.form.get('image_url')
+    is_interior = request.form.get('is_interior') == '1'
+
+    if not image_url:
+        flash('Image URL cannot be empty.', 'danger')
+    else:
+        img.title = title
+        img.caption = caption
+        img.image_url = image_url
+        img.is_interior = is_interior
+        db.session.commit()
+        flash(f"Cottage photo '{img.title or image_id}' updated/replaced successfully.", 'success')
+
+    return redirect(url_for('admin.gallery', active_tab='cottages'))
+
+@admin_bp.route('/gallery/cottage-image/<int:image_id>/delete', methods=['POST'])
+@admin_required
+def delete_cottage_image(image_id):
+    img = db.session.get(AccommodationImage, image_id)
+    if img:
+        db.session.delete(img)
+        db.session.commit()
+        flash('Cottage photo removed from package image set.', 'success')
+    return redirect(url_for('admin.gallery', active_tab='cottages'))
+
 

@@ -67,7 +67,14 @@
                             <tbody>
                                 {% for u in units %}
                                     <tr>
-                                        <td><strong>{{ u.name }}</strong></td>
+                                        <td>
+                                            <strong>{{ u.name }}</strong>
+                                            <div>
+                                                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none small text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#cottageModal{{ u.id }}">
+                                                    <i class="bi bi-images text-warning me-1"></i>{{ u.get_all_images()|length }} Photos
+                                                </button>
+                                            </div>
+                                        </td>
                                         <td>{{ u.capacity }} guest(s)</td>
                                         <td class="fw-bold text-success">₱{{ "{:,.2f}".format(u.nightly_rate) }}</td>
                                         <td><small class="text-muted">{{ u.description or 'No description' }}</small></td>
@@ -79,6 +86,9 @@
                                             {% endif %}
                                         </td>
                                         <td class="text-end">
+                                            <button type="button" class="btn btn-sm btn-outline-info me-1" data-bs-toggle="modal" data-bs-target="#cottageModal{{ u.id }}">
+                                                <i class="bi bi-eye"></i> Gallery
+                                            </button>
                                             <form action="{{ url_for('admin.toggle_accommodation', unit_id=u.id) }}" method="POST" class="d-inline">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <button type="submit" class="btn btn-sm {% if u.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
@@ -100,4 +110,9 @@
         </div>
     </div>
 </div>
+
+<!-- Cottage Modals for Admin -->
+{% for u in units %}
+    {% include '_cottage_modal.html' %}
+{% endfor %}
 {% endblock %}

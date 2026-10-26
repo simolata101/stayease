@@ -45,7 +45,14 @@
                             <strong class="font-monospace text-primary">{{ b.booking_reference }}</strong>
                             <div class="text-muted small">{{ b.created_at.strftime('%Y-%m-%d') }}</div>
                         </td>
-                        <td>{{ b.accommodation.name }}</td>
+                        <td>
+                            <strong>{{ b.accommodation.name }}</strong>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none small text-secondary" data-bs-toggle="modal" data-bs-target="#cottageModal{{ b.accommodation.id }}">
+                                    <i class="bi bi-door-open-fill text-warning me-1"></i>View Inside ({{ b.accommodation.get_all_images()|length }})
+                                </button>
+                            </div>
+                        </td>
                         <td>
                             {{ b.check_in_date.strftime('%b %d, %Y') }} - <br>
                             {{ b.check_out_date.strftime('%b %d, %Y') }}
@@ -82,5 +89,11 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Cottage Gallery Modals for My Bookings -->
+    {% for item in bookings %}
+        {% set u = item.booking.accommodation %}
+        {% include '_cottage_modal.html' %}
+    {% endfor %}
 {% endif %}
 {% endblock %}

@@ -47,3 +47,68 @@ body {
     color: var(--primary-color);
     font-weight: 700;
 }
+
+/* Cottage Image Set & Interior Gallery */
+.cottage-card-img-wrapper {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.cottage-card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.accommodation-card:hover .cottage-card-img-wrapper img {
+    transform: scale(1.05);
+}
+
+.cottage-photo-badge {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    backdrop-filter: blur(4px);
+}
+
+.cottage-thumb-strip {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 6px 0;
+}
+
+.cottage-thumb-item {
+    width: 65px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0.75;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.cottage-thumb-item:hover, .cottage-thumb-item.active {
+    opacity: 1;
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.carousel-caption-custom {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    border-radius: 8px;
+    padding: 10px 16px;
+    bottom: 20px;
+}
+
